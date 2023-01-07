@@ -1,0 +1,3 @@
+/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug/CMakeFiles/sdl2-ttf-sample.dir
+/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug/CMakeFiles/rebuild_cache.dir
