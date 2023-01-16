@@ -13,6 +13,7 @@
 #define WINDOW_HEIGHT 450
 //https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
 #define ENOUGH snprintf(NULL, 0,"%d",42)
+int startNumbers[9][9];
 
 typedef struct rect{
     bool isClicked;
@@ -22,7 +23,7 @@ typedef struct rect{
 rect rects[9][9];
 
 
-void getNumbers(int level, int startNumbers[9][9]){
+void getNumbers(int level){
     //stworzenie sciezki do pliku, bufor 27 poniewaz taka jest dlugosc stringa + znak \0
     printf("%d\n", level);
     char path[27];
@@ -44,11 +45,7 @@ void getNumbers(int level, int startNumbers[9][9]){
 
 }
 
-void updateRect(char *string){
-    printf("Wpisano: %s\n", string);
 
-
-}
 
 void isMouseInRect(void) {
     int mouseX, mouseY;
@@ -58,13 +55,16 @@ void isMouseInRect(void) {
             SDL_Point mousePoint = {mouseX, mouseY};
             if (SDL_PointInRect(&mousePoint, &rects[i][j].rect)) {
                 printf("Kliknięcie nastąpiło w prostokącie (%d, %d)\n", i, j);
+                rects[i][j].isClicked = true;
                 SDL_StartTextInput();
 
-
             }
+
         }
-    }}
-void createRects(SDL_Renderer* renderer, int startNumbers[9][9]){
+    }
+
+}
+void createRects(SDL_Renderer* renderer){
     // ustawianie fontu
     TTF_Font *font = TTF_OpenFont("./assets/pacifico/Pacifico.ttf", 24);
     if (!font) {
@@ -77,13 +77,23 @@ void createRects(SDL_Renderer* renderer, int startNumbers[9][9]){
 
     for(int i = 0; i<9 ; i++){
         for(int j = 0; j<9; j++) {
-            rects[i][j].rect = (SDL_Rect){i * (WINDOW_WIDTH / 9), j * (WINDOW_HEIGHT / 9), 50, 50};
+            rects[i][j].rect = (SDL_Rect) {i * (WINDOW_WIDTH / 9), j * (WINDOW_HEIGHT / 9), 50, 50};
+
+
+            if (rects[i][j].isClicked == true) {
+            SDL_SetRenderDrawColor(renderer, 0, 150, 50, 10);
+            SDL_RenderFillRect(renderer, &rects[i][j].rect);
+        }
+            else {
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderDrawRect(renderer, &rects[i][j].rect);
+            }
+
             rects[i][j].isClicked = false;
 
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
 
-            SDL_RenderDrawRect(renderer, &rects[i][j].rect);
+//            SDL_RenderDrawRect(renderer, &rects[i][j].rect);
 
             //przeksztalca cyfre w stringa,
             char number_str[ENOUGH+1];
@@ -139,10 +149,37 @@ int pickLevel(void){
 
     return level;
 }
+void updateScreen(SDL_Renderer* renderer){
+    SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+    SDL_RenderClear(renderer);
+    //rysowanie kwadratow
+    createRects(renderer);
+    // render linii
+    createLines(renderer);
+
+    SDL_RenderPresent(renderer);
+}
+void updateRect(SDL_Renderer* renderer, char *string, char *option){
+    printf("Wpisano: %s\n", option);
+    for(int i = 0; i < 9; i++) {
+        for(int j = 0; j < 9; j++) {
+            if(rects[i][j].isClicked == true){
+                updateScreen(renderer);
+                printf("do kwadratu (%d,%d) wpisano %s %s\n", i, j, string, option);
+            }
+
+        }
+    }
+
+}
 int main(void) {
+
+
+
+
     //wczytanie poziomu
-    int startNumbers[9][9];
-    getNumbers(pickLevel(), startNumbers);
+
+    getNumbers(pickLevel());
 
     bool quit = false;
     SDL_Event event;
@@ -155,16 +192,11 @@ int main(void) {
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     //ustawianie koloru tla
-    SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-    SDL_RenderClear(renderer);
-    //rysowanie kwadratow
-    createRects(renderer, startNumbers);
-    // render linii
-    createLines(renderer);
 
 
+    updateScreen(renderer);
 
-    SDL_RenderPresent(renderer);
+
 
     //czyszczenie pamieci
     while (!quit) {
@@ -176,11 +208,12 @@ int main(void) {
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 isMouseInRect();
+                updateRect(renderer,"", "clicked");
                 break;
             case SDL_TEXTINPUT:
                 SDL_StopTextInput();
 
-                updateRect(event.text.text);
+                updateRect(renderer, event.text.text, "text");
                 break;
         }
     }
