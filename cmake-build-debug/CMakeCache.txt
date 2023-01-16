@@ -146,7 +146,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=sdl2-ttf-sample
+CMAKE_PROJECT_NAME:STATIC=SudokuSDL
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/Library/Developer/CommandLineTools/usr/bin/ranlib
@@ -248,6 +248,15 @@ SDL2_TTF_NO_DEFAULT_PATH:BOOL=OFF
 
 //Custom SDL2_ttf Library path
 SDL2_TTF_PATH:STRING=
+
+//Value Computed by CMake
+SudokuSDL_BINARY_DIR:STATIC=/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug
+
+//Value Computed by CMake
+SudokuSDL_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+SudokuSDL_SOURCE_DIR:STATIC=/Users/kundelski/CLionProjects/SudokuSDL
 
 //Value Computed by CMake
 sdl2-ttf-sample_BINARY_DIR:STATIC=/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug

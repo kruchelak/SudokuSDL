@@ -11,20 +11,25 @@
 #define MAX_SURFACES_Y 9
 #define WINDOW_WIDTH 450
 #define WINDOW_HEIGHT 450
+//https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
 #define ENOUGH snprintf(NULL, 0,"%d",42)
 
+typedef struct rect{
+    bool isClicked;
+    SDL_Rect *rect;
 
+}rect;
 SDL_Rect rects[9][9];
 int clickedRect[9][9];
 
 
 void getNumbers(int level, int startNumbers[9][9]){
-    //stworzenie sciezki do pliku, bufor 25 poniewaz taka jest dlugosc stringa + znak \0
+    //stworzenie sciezki do pliku, bufor 27 poniewaz taka jest dlugosc stringa + znak \0
     printf("%d\n", level);
-//    char path[29];
-//    snprintf(path, 29, "./Levels/Level_%d/start_%d.txt", poziom, poziom);
-//    printf("%s\n", path); // dziala
-    FILE *file = fopen("/Users/kundelski/CLionProjects/SudokuSDL/assets/levels/start1.txt","r");
+    char path[27];
+    snprintf(path, 27, "./assets/levels/start%d.txt", level);
+    printf("%s\n", path);
+    FILE *file = fopen(path,"r");
     if (file == NULL) {
         // wystąpił błąd podczas otwierania pliku
         fprintf(stderr, "Nie udało się otworzyć pliku: %s\n", strerror(errno));
@@ -121,14 +126,26 @@ void createLines( SDL_Renderer* renderer){
 
     }
 }
+int pickLevel(void){
+
+    int level=0;
+
+    printf("Wybierz poziom 1-3\n");
+    while(level <1 || level >3){
+
+        scanf("%d", &level);
+        if(level <1 || level >3)
+         printf("Zły znak.Wybierz liczbe od 1 do 3.\n");
+
+    }
+
+
+    return level;
+}
 int main(void) {
     //wczytanie poziomu
-//    int level;
-//    scanf("%d", &level);
     int startNumbers[9][9];
-    getNumbers(1, startNumbers);
-
-
+    getNumbers(pickLevel(), startNumbers);
 
     bool quit = false;
     SDL_Event event;
@@ -164,7 +181,8 @@ int main(void) {
                 isMouseInRect();
                 break;
             case SDL_TEXTINPUT:
-                printf("test");
+
+                printf("Wpisano: %s\n", event.text.text);
                 updateRect();
                 break;
         }
