@@ -16,11 +16,10 @@
 
 typedef struct rect{
     bool isClicked;
-    SDL_Rect *rect;
+    SDL_Rect rect;
 
 }rect;
-SDL_Rect rects[9][9];
-int clickedRect[9][9];
+rect rects[9][9];
 
 
 void getNumbers(int level, int startNumbers[9][9]){
@@ -45,29 +44,26 @@ void getNumbers(int level, int startNumbers[9][9]){
 
 }
 
-void updateRect(void){
-    SDL_StopTextInput();
+void updateRect(char *string){
+    printf("Wpisano: %s\n", string);
 
 
 }
-void checkClickInRects(int mouseX, int mouseY) {
+
+void isMouseInRect(void) {
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX,&mouseY);
     for(int i = 0; i < 9; i++) {
         for(int j = 0; j < 9; j++) {
             SDL_Point mousePoint = {mouseX, mouseY};
-            if (SDL_PointInRect(&mousePoint, &rects[i][j])) {
+            if (SDL_PointInRect(&mousePoint, &rects[i][j].rect)) {
                 printf("Kliknięcie nastąpiło w prostokącie (%d, %d)\n", i, j);
                 SDL_StartTextInput();
 
 
             }
         }
-    }
-}
-void isMouseInRect(void) {
-    int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX,&mouseY);
-    checkClickInRects(mouseX, mouseY);
-}
+    }}
 void createRects(SDL_Renderer* renderer, int startNumbers[9][9]){
     // ustawianie fontu
     TTF_Font *font = TTF_OpenFont("./assets/pacifico/Pacifico.ttf", 24);
@@ -81,16 +77,17 @@ void createRects(SDL_Renderer* renderer, int startNumbers[9][9]){
 
     for(int i = 0; i<9 ; i++){
         for(int j = 0; j<9; j++) {
-            rects[i][j] = (SDL_Rect){i * (WINDOW_WIDTH / 9), j * (WINDOW_HEIGHT / 9), 50, 50};
+            rects[i][j].rect = (SDL_Rect){i * (WINDOW_WIDTH / 9), j * (WINDOW_HEIGHT / 9), 50, 50};
+            rects[i][j].isClicked = false;
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-            SDL_RenderDrawRect(renderer, &rects[i][j]);
+
+            SDL_RenderDrawRect(renderer, &rects[i][j].rect);
 
             //przeksztalca cyfre w stringa,
             char number_str[ENOUGH+1];
             sprintf(number_str, "%d", startNumbers[i][j]);
-
 
 
             // tworzenie powierzchni rysowania dla tekstu
@@ -104,7 +101,7 @@ void createRects(SDL_Renderer* renderer, int startNumbers[9][9]){
             // tworzenie tekstury z powierzchni, brak tekstury jesli pole = 0
             SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, textSurfaces[i][j]);
             if (startNumbers[i][j] != 0) {
-                SDL_RenderCopy(renderer, text_texture, NULL, &rects[i][j]);
+                SDL_RenderCopy(renderer, text_texture, NULL, &rects[i][j].rect);
             }
 
         }
@@ -181,9 +178,9 @@ int main(void) {
                 isMouseInRect();
                 break;
             case SDL_TEXTINPUT:
+                SDL_StopTextInput();
 
-                printf("Wpisano: %s\n", event.text.text);
-                updateRect();
+                updateRect(event.text.text);
                 break;
         }
     }
