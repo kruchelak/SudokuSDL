@@ -14,6 +14,7 @@
 //https://stackoverflow.com/questions/8257714/how-to-convert-an-int-to-string-in-c
 #define ENOUGH snprintf(NULL, 0,"%d",42)
 int startNumbers[9][9];
+int correctNumbers[9][9];
 
 typedef struct rect{
     bool isClicked;
@@ -26,11 +27,17 @@ rect rects[9][9];
 void getNumbers(int level){
     //stworzenie sciezki do pliku, bufor 27 poniewaz taka jest dlugosc stringa + znak \0
     printf("%d\n", level);
-    char path[27];
-    snprintf(path, 27, "./assets/levels/start%d.txt", level);
-    printf("%s\n", path);
-    FILE *file = fopen(path,"r");
-    if (file == NULL) {
+    char pathstart[27];
+    char pathend[25];
+    snprintf(pathstart, 27, "./assets/levels/start%d.txt", level);
+
+    snprintf(pathend, 25, "./assets/levels/end%d.txt", level);
+    printf("%s\n", pathstart);
+    printf("%s\n", pathend);
+
+    FILE *start = fopen(pathstart, "r");
+    FILE *correct = fopen(pathend,"r");
+    if (start == NULL || correct == NULL) {
         // wystąpił błąd podczas otwierania pliku
         fprintf(stderr, "Nie udało się otworzyć pliku: %s\n", strerror(errno));
         return;
@@ -38,35 +45,23 @@ void getNumbers(int level){
     //wkladanie liczb z pliku do tablicy
     for(int i = 0; i<9; i++){
         for(int j = 0; j<9; j++){
-            fscanf(file, "%d", &startNumbers[j][i]);
+            fscanf(start, "%d", &startNumbers[j][i]);
+            fscanf(correct, "%d", &correctNumbers[j][i]);
+
+
         }
     }
-    fclose(file);
+    fclose(start);
+    fclose(correct);
+
 
 }
 
 
 
-void isMouseInRect(void) {
-    int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX,&mouseY);
-    for(int i = 0; i < 9; i++) {
-        for(int j = 0; j < 9; j++) {
-            SDL_Point mousePoint = {mouseX, mouseY};
-            if (SDL_PointInRect(&mousePoint, &rects[i][j].rect)) {
-                printf("Kliknięcie nastąpiło w prostokącie (%d, %d)\n", i, j);
-                rects[i][j].isClicked = true;
-                SDL_StartTextInput();
-
-            }
-
-        }
-    }
-
-}
 void createRects(SDL_Renderer* renderer){
     // ustawianie fontu
-    TTF_Font *font = TTF_OpenFont("./assets/pacifico/Pacifico.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("./assets/OpenSans/OpenSans-Regular.ttf", 128);
     if (!font) {
         fprintf(stderr, "Nie udało się otworzyć fontu: %s\n", TTF_GetError());
         exit(1);
@@ -159,19 +154,71 @@ void updateScreen(SDL_Renderer* renderer){
 
     SDL_RenderPresent(renderer);
 }
-void updateRect(SDL_Renderer* renderer, char *string, char *option){
-    printf("Wpisano: %s\n", option);
+void isMouseInRect(SDL_Renderer* renderer) {
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX,&mouseY);
     for(int i = 0; i < 9; i++) {
         for(int j = 0; j < 9; j++) {
-            if(rects[i][j].isClicked == true){
-                updateScreen(renderer);
-                printf("do kwadratu (%d,%d) wpisano %s %s\n", i, j, string, option);
+            SDL_Point mousePoint = {mouseX, mouseY};
+            if (SDL_PointInRect(&mousePoint, &rects[i][j].rect)) {
+                printf("Kliknięcie nastąpiło w prostokącie (%d, %d)\n", i, j);
+
+                if(startNumbers[i][j] == 0) {
+                    rects[i][j].isClicked = true;
+                    SDL_StartTextInput();
+                }
+                else {
+                    printf("kliknieto zly prostokat\n");
+                    updateScreen(renderer);
+                }
+
             }
 
         }
     }
 
 }
+
+//x,y recta w tablicy rectow,
+// prawdopodobnie nadal lepiej byloby przekazywac tego recta przez funckje znajdujaca nacisnietego,
+// trzeba pomyslec czy sie oplaca to zmieniac
+//
+int x=0;
+int y=0;
+void updateRect(SDL_Renderer* renderer, char *string, int option){
+
+    if(option == 1){
+//        printf("kliknieto\n");
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                if(rects[i][j].isClicked == true){
+                    x=i;
+                    y=j;
+                    updateScreen(renderer);
+                }
+
+            }
+        }
+    }
+    if(option == 2){
+        SDL_StopTextInput();
+//        printf("%d",atoi(string));
+//        printf("%d", correctNumbers[x][y]);
+        if(atoi(string) == correctNumbers[x][y] && startNumbers[x][y] != correctNumbers[x][y]){
+            printf("wpisana dobra liczbe\n");
+        }
+        else
+            printf("wpisano zla liczbe\n");
+
+        updateScreen(renderer);
+
+    }
+
+}
+
+
+
+//fills the clicked rect with color, checks after input if the input is correct, and isnt the starting input
 int main(void) {
 
 
@@ -207,13 +254,13 @@ int main(void) {
                 quit = true;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                isMouseInRect();
-                updateRect(renderer,"", "clicked");
+                isMouseInRect(renderer);
+                updateRect(renderer,"", 1);
                 break;
             case SDL_TEXTINPUT:
-                SDL_StopTextInput();
 
-                updateRect(renderer, event.text.text, "text");
+
+                updateRect(renderer, event.text.text, 2);
                 break;
         }
     }
