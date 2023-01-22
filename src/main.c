@@ -4,7 +4,6 @@
 #include <SDL_ttf.h>
 #include <stdbool.h>
 #include <SDL2_gfxPrimitives.h>
-#include <limits.h>
 #include <errno.h>
 
 #define MAX_SURFACES_X 9
@@ -24,7 +23,7 @@ typedef struct rect{
 rect rects[9][9];
 
 
-void getNumbers(int level){
+void get_numbers(int level){
     //stworzenie sciezki do pliku, bufor 27 poniewaz taka jest dlugosc stringa + znak \0
     printf("%d\n", level);
     char pathstart[27];
@@ -56,10 +55,16 @@ void getNumbers(int level){
 
 
 }
+int check_win(void){
+    int a = memcmp(correctNumbers, startNumbers, sizeof(correctNumbers));
+    if(!a)
+        return 0; // arrays are equal
+    else
+        return 1; //error, arrays are not equal
+}
 
 
-
-void createRects(SDL_Renderer* renderer){
+void create_rects(SDL_Renderer* renderer){
     // ustawianie fontu
     TTF_Font *font = TTF_OpenFont("./assets/OpenSans/OpenSans-Regular.ttf", 128);
     if (!font) {
@@ -111,8 +116,11 @@ void createRects(SDL_Renderer* renderer){
 
         }
 
-    }
 
+    }
+    if(!check_win()){
+        printf("WYGRANA!");
+    }
 
     TTF_CloseFont(font);
     for (int i = 0; i < MAX_SURFACES_X; i++) {
@@ -121,14 +129,14 @@ void createRects(SDL_Renderer* renderer){
         }
     }
 }
-void createLines( SDL_Renderer* renderer){
+void create_lines(SDL_Renderer* renderer){
     for(int i =1 ;i<3 ;i++) {
         thickLineRGBA(renderer, (WINDOW_WIDTH/3)*i, 0, (WINDOW_WIDTH/3)*i, WINDOW_HEIGHT, 5, 0, 0, 0, 255);
         thickLineRGBA(renderer, 0, (WINDOW_HEIGHT/3)*i, WINDOW_WIDTH, (WINDOW_HEIGHT/3)*i, 5, 0, 0, 0, 255);
 
     }
 }
-int pickLevel(void){
+int pick_level(void){
 
     int level=0;
 
@@ -144,17 +152,17 @@ int pickLevel(void){
 
     return level;
 }
-void updateScreen(SDL_Renderer* renderer){
+void update_screen(SDL_Renderer* renderer){
     SDL_SetRenderDrawColor(renderer, 255,255,255,255);
     SDL_RenderClear(renderer);
     //rysowanie kwadratow
-    createRects(renderer);
+    create_rects(renderer);
     // render linii
-    createLines(renderer);
+    create_lines(renderer);
 
     SDL_RenderPresent(renderer);
 }
-void isMouseInRect(SDL_Renderer* renderer) {
+void check_mouse_in_rect(SDL_Renderer* renderer) {
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX,&mouseY);
     for(int i = 0; i < 9; i++) {
@@ -169,7 +177,7 @@ void isMouseInRect(SDL_Renderer* renderer) {
                 }
                 else {
                     printf("kliknieto zly prostokat\n");
-                    updateScreen(renderer);
+                    update_screen(renderer);
                 }
 
             }
@@ -194,7 +202,8 @@ void updateRect(SDL_Renderer* renderer, char *string, int option){
                 if(rects[i][j].isClicked == true){
                     x=i;
                     y=j;
-                    updateScreen(renderer);
+
+                    update_screen(renderer);
                 }
 
             }
@@ -205,12 +214,14 @@ void updateRect(SDL_Renderer* renderer, char *string, int option){
 //        printf("%d",atoi(string));
 //        printf("%d", correctNumbers[x][y]);
         if(atoi(string) == correctNumbers[x][y] && startNumbers[x][y] != correctNumbers[x][y]){
-            printf("wpisana dobra liczbe\n");
+            startNumbers[x][y] =atoi(string);
+            printf("wpisana dobra liczbe\n\n");
+            check_win();
         }
         else
             printf("wpisano zla liczbe\n");
 
-        updateScreen(renderer);
+        update_screen(renderer);
 
     }
 
@@ -218,7 +229,6 @@ void updateRect(SDL_Renderer* renderer, char *string, int option){
 
 
 
-//fills the clicked rect with color, checks after input if the input is correct, and isnt the starting input
 int main(void) {
 
 
@@ -226,7 +236,7 @@ int main(void) {
 
     //wczytanie poziomu
 
-    getNumbers(pickLevel());
+    get_numbers(pick_level());
 
     bool quit = false;
     SDL_Event event;
@@ -241,7 +251,7 @@ int main(void) {
     //ustawianie koloru tla
 
 
-    updateScreen(renderer);
+    update_screen(renderer);
 
 
 
@@ -254,7 +264,8 @@ int main(void) {
                 quit = true;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                isMouseInRect(renderer);
+//                check_win();
+                check_mouse_in_rect(renderer);
                 updateRect(renderer,"", 1);
                 break;
             case SDL_TEXTINPUT:
