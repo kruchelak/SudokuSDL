@@ -17,7 +17,7 @@ CMake Warning (dev) at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmak
 Call Stack (most recent call first):
   cmake/sdl2/FindSDL2.cmake:318 (FIND_PACKAGE_HANDLE_STANDARD_ARGS)
   cmake/sdl2/FindSDL2_ttf.cmake:114 (find_package)
-  CMakeLists.txt:31 (find_package)
+  CMakeLists.txt:27 (find_package)
 This warning is for project developers.  Use -Wno-dev to suppress it.
 
 CMake Warning (dev) at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.24/Modules/FindPackageHandleStandardArgs.cmake:438 (message):
@@ -28,7 +28,7 @@ CMake Warning (dev) at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmak
 Call Stack (most recent call first):
   cmake/sdl2/FindSDL2.cmake:318 (FIND_PACKAGE_HANDLE_STANDARD_ARGS)
   cmake/sdl2/FindSDL2_gfx.cmake:114 (find_package)
-  CMakeLists.txt:43 (find_package)
+  CMakeLists.txt:31 (find_package)
 This warning is for project developers.  Use -Wno-dev to suppress it.
 
 -- Configuring done

@@ -23,23 +23,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE $<$<NOT:$<C_COMPILER_ID:MSVC>>:-W
 find_package(SDL2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} SDL2::Main)
 
-# Add SDL2_image library
-#find_package(SDL2_image REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::Image)
-
-# Add SDL2_ttf library
+# Add SDL2_ttf library, fonts and texts
 find_package(SDL2_ttf REQUIRED)
 target_link_libraries(${PROJECT_NAME} SDL2::TTF)
 
-# Add SDL2_net library
-#find_package(SDL2_net REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::Net)
-
-# Add SDL2_mixer library
-#find_package(SDL2_mixer REQUIRED)
-#target_link_libraries(${PROJECT_NAME} SDL2::Mixer)
-
-# Add SDL2_gfx library
+# Add SDL2_gfx library, simple graphic
 find_package(SDL2_gfx REQUIRED)
 target_link_libraries(${PROJECT_NAME} SDL2::GFX)
 
