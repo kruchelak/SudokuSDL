@@ -14,7 +14,7 @@
 #define ENOUGH snprintf(NULL, 0,"%d",42)
 int startNumbers[9][9]; //start board
 int correctNumbers[9][9]; //complete board
-
+int mistakesCounter =0;
 typedef struct rect{
     bool isClicked;
     SDL_Rect rect;
@@ -111,7 +111,8 @@ void create_rects(SDL_Renderer* renderer){
 
     }
     if(!check_win()){
-        printf("YOU WON!");
+        printf("YOU WON!\n");
+        printf("Mistakes counted: %d", mistakesCounter);
     }
 
     TTF_CloseFont(font);
@@ -201,12 +202,13 @@ void update_rect(SDL_Renderer* renderer, char *string, int option){
         SDL_StopTextInput();
         if(atoi(string) == correctNumbers[x][y] && startNumbers[x][y] != correctNumbers[x][y]){
             startNumbers[x][y] =atoi(string);
-            printf("Correct Number\n\n");
+//            printf("Correct Number\n");
             check_win();
         }
-        else
+        else {
             printf("Wrong input\n");
-
+            mistakesCounter++;
+        }
         update_screen(renderer);
 
     }
@@ -220,7 +222,7 @@ int main(void) {
 
 
 
-    //picking level,passes level number to get_numbers function
+    //picks level,passes level number to get_numbers function
     get_numbers(pick_level());
 
     bool quit = false;

@@ -34,3 +34,6 @@ target_link_libraries(${PROJECT_NAME} SDL2::GFX)
 # Copy assets
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
+
+
+
