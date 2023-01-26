@@ -249,6 +249,9 @@ SDL2_TTF_NO_DEFAULT_PATH:BOOL=OFF
 //Custom SDL2_ttf Library path
 SDL2_TTF_PATH:STRING=
 
+//The directory containing a CMake configuration file for SDL2main.
+SDL2main_DIR:PATH=SDL2main_DIR-NOTFOUND
+
 //Value Computed by CMake
 SudokuSDL_BINARY_DIR:STATIC=/Users/kundelski/CLionProjects/SudokuSDL/cmake-build-debug
 
